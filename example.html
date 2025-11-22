@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诗歌生成器 - 示例</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ffd700, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .input-section {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .input-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+        
+        .input-description {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        #inputText {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        #inputText:focus {
+            border-color: #888888;
+            box-shadow: 0 0 20px rgba(136, 136, 136, 0.3);
+        }
+        
+        #inputText::placeholder {
+            color: #999;
+        }
+        
+        .generate-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 15px 40px;
+            background: #333333;
+            color: white;
+            border: 2px solid #666666;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .generate-btn:hover {
+            transform: scale(1.05);
+            background: #555555;
+            border-color: #888888;
+        }
+        
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .output-section {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .output-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        
+        #poeticOutput {
+            font-family: 'KaiTi', '楷体', serif;
+            font-size: 18px;
+            line-height: 1.8;
+            min-height: 200px;
+            white-space: pre-wrap;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .config-section {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .config-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+        
+        .config-item {
+            margin-bottom: 15px;
+        }
+        
+        .config-item label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .config-item input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .config-item input:focus {
+            outline: none;
+            border-color: #888888;
+            box-shadow: 0 0 10px rgba(136, 136, 136, 0.3);
+        }
+        
+        .config-help {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .config-help a {
+            color: #cccccc;
+            text-decoration: none;
+        }
+        
+        .config-help a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">诗意星空</h1>
+        
+        <!-- API配置区域 -->
+        <div class="config-section">
+            <h3 class="config-title">API配置</h3>
+            <div class="config-item">
+                <label for="apiKeyInput">OpenAI Compatible API Key:</label>
+                <input type="password" id="apiKeyInput" placeholder="请输入您的API Key">
+                <p class="config-help">获取API Key: <a href="https://api.aiclause.site" target="_blank">https://api.aiclause.site</a></p>
+            </div>
+        </div>
+        
+        <!-- 输入区域 -->
+        <div class="input-section">
+            <h3 class="input-title">故乡入口</h3>
+            <p class="input-description">输入您的中文文本，让诗意在星空中绽放</p>
+            <textarea 
+                id="inputText" 
+                placeholder="在这里输入您想要转换的中文文本..."
+            ></textarea>
+            <button id="generateBtn" class="generate-btn" onclick="generatePoem()">
+                生成诗歌 ✨
+            </button>
+        </div>
+        
+        <!-- 输出区域 -->
+        <div class="output-section">
+            <h3 class="output-title">诗意转化结果</h3>
+            <div id="poeticOutput">等待诗意绽放...</div>
+        </div>
+    </div>
+
+    <script>
+        // API配置
+        const API_URL = 'https://api.aiclause.site/v1/completions';
+        let API_KEY = localStorage.getItem('openai-api-key') || '';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载保存的API Key
+            if (API_KEY) {
+                document.getElementById('apiKeyInput').value = API_KEY;
+            }
+            
+            // 监听API Key输入
+            document.getElementById('apiKeyInput').addEventListener('input', function() {
+                API_KEY = this.value.trim();
+                localStorage.setItem('openai-api-key', API_KEY);
+            });
+            
+            // 监听文本输入
+            document.getElementById('inputText').addEventListener('input', function() {
+                updateGenerateButton();
+            });
+        });
+
+        // 更新生成按钮状态
+        function updateGenerateButton() {
+            const input = document.getElementById('inputText');
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = !input.value.trim() || !API_KEY;
+        }
+
+        // 生成诗歌
+        async function generatePoem() {
+            const input = document.getElementById('inputText').value.trim();
+            const output = document.getElementById('poeticOutput');
+            
+            if (!input) {
+                alert('请输入文本内容！');
+                return;
+            }
+            
+            if (!API_KEY) {
+                alert('请先配置API Key！');
+                return;
+            }
+
+            output.innerText = "🌌 正在生成中，请稍等...";
+            
+            // 禁用按钮
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.innerText = "生成中...";
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "deepseek-r1",
+                        prompt: `
+你是一位诗歌分析与转化者，请分析以下文字并生成新的诗意表达，是關於故鄉和宇宙的鏈接的：
+${input}
+                        `,
+                        max_tokens: 300
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API调用失败: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                output.innerText = data.choices[0].text || "生成失败，请检查API服务。";
+                
+            } catch (error) {
+                console.error('生成诗歌失败:', error);
+                output.innerText = `生成失败: ${error.message}`;
+            } finally {
+                // 恢复按钮
+                btn.disabled = false;
+                btn.innerText = "生成诗歌 ✨";
+                updateGenerateButton();
+            }
+        }
+    </script>
+</body>
+</html>

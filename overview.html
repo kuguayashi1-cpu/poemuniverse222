@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诗意总览 - Poetry Overview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'SimSun', serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 星空背景 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.3), transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: twinkle 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* 浮动粒子 */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); opacity: 0.3; }
+            50% { transform: translateY(-30px); opacity: 0.8; }
+        }
+
+        /* 主要内容 */
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: breath 3s ease-in-out infinite;
+        }
+
+        @keyframes breath {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 控制面板 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-label {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .font-size-control {
+            width: 120px;
+        }
+
+        .color-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .color-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .color-btn.active {
+            border-color: white;
+            transform: scale(1.2);
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        /* 历史网格 */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 1.2s both;
+        }
+
+        .history-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-card:hover {
+            border-color: #8b5cf6;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .history-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 15px;
+            padding: 2px;
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .history-card:hover::before {
+            opacity: 0.3;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffd700;
+            line-height: 1.4;
+        }
+
+        .card-icon {
+            font-size: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .card-poetry {
+            font-family: 'KaiTi', '楷体', serif;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+            font-size: 16px;
+            transition: font-size 0.3s ease;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .card-time {
+            color: #8b5cf6;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-action-btn {
+            padding: 4px 8px;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 4px;
+            color: #8b5cf6;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card-action-btn:hover {
+            background: rgba(139, 92, 246, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* 浮动文字效果 */
+        .floating-text {
+            position: fixed;
+            pointer-events: none;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 0;
+            animation: floatText 6s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        @keyframes floatText {
+            0% { 
+                opacity: 0; 
+                transform: translate(0, 0) scale(0.5) rotate(0deg); 
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: translate(var(--random-x), var(--random-y)) scale(1.2) rotate(180deg); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translate(var(--random-x2), var(--random-y2)) scale(0.5) rotate(360deg); 
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .history-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .history-card {
+                padding: 20px;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #ec4899, #ffd700);
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="stars"></div>
+    
+    <!-- 浮动粒子 -->
+    <div id="particles"></div>
+    
+    <!-- 主要内容 -->
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1 class="title">诗意总览</h1>
+            <p class="subtitle">在星空中混合漂浮的诗意文字</p>
+        </header>
+        
+        <!-- 控制面板 -->
+        <div class="controls">
+            <div class="control-group">
+                <span class="control-label">字体大小:</span>
+                <input type="range" id="fontSizeSlider" class="font-size-control" min="12" max="32" value="16">
+                <span id="fontSizeValue" class="control-label">16px</span>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">文字颜色:</span>
+                <div class="color-controls">
+                    <div class="color-btn active" data-color="#ffffff" style="background: #ffffff;"></div>
+                    <div class="color-btn" data-color="#ffd700" style="background: #ffd700;"></div>
+                    <div class="color-btn" data-color="#8b5cf6" style="background: #8b5cf6;"></div>
+                    <div class="color-btn" data-color="#ec4899" style="background: #ec4899;"></div>
+                    <div class="color-btn" data-color="#00ffff" style="background: #00ffff;"></div>
+                    <div class="color-btn" data-color="#00ff00" style="background: #00ff00;"></div>
+                </div>
+            </div>
+            
+            <button class="back-btn" onclick="goBack()">← 返回主页</button>
+        </div>
+        
+        <!-- 历史网格 -->
+        <div class="history-grid" id="historyGrid">
+            <!-- 历史记录将在这里动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let history = [];
+        let currentFontSize = 16;
+        let currentColor = '#ffffff';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            loadHistory();
+            setupControls();
+            createFloatingText();
+        });
+
+        // 创建粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (3 + Math.random() * 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 设置控制面板
+        function setupControls() {
+            // 字体大小控制
+            const fontSizeSlider = document.getElementById('fontSizeSlider');
+            const fontSizeValue = document.getElementById('fontSizeValue');
+            
+            fontSizeSlider.addEventListener('input', function() {
+                currentFontSize = parseInt(this.value);
+                fontSizeValue.textContent = currentFontSize + 'px';
+                updatePoetryFontSize();
+            });
+
+            // 颜色控制
+            const colorBtns = document.querySelectorAll('.color-btn');
+            colorBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    colorBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentColor = this.dataset.color;
+                    updatePoetryColor();
+                });
+            });
+        }
+
+        // 更新诗歌字体大小
+        function updatePoetryFontSize() {
+            const poetryElements = document.querySelectorAll('.card-poetry');
+            poetryElements.forEach(element => {
+                element.style.fontSize = currentFontSize + 'px';
+            });
+        }
+
+        // 更新诗歌颜色
+        function updatePoetryColor() {
+            const poetryElements = document.querySelectorAll('.card-poetry');
+            poetryElements.forEach(element => {
+                element.style.color = currentColor;
+            });
+        }
+
+        // 加载历史记录
+        function loadHistory() {
+            // 尝试从localStorage加载历史记录
+            const savedHistory = localStorage.getItem('poetry-history');
+            if (savedHistory) {
+                history = JSON.parse(savedHistory);
+            } else {
+                // 如果没有历史记录，创建一些示例数据
+                history = [
+                    {
+                        id: '1',
+                        input: '春眠不觉晓，处处闻啼鸟',
+                        poetry: '春眠不觉晓\n处处闻啼鸟',
+                        floatingText: '春眠不觉晓处处闻啼鸟诗星梦幻美意空灵飘浮游荡飞翔闪烁',
+                        timestamp: '2024-01-15 10:30'
+                    },
+                    {
+                        id: '2',
+                        input: '床前明月光，疑是地上霜',
+                        poetry: '床前明月光\n疑是地上霜',
+                        floatingText: '床前明月光疑是地上霜诗星梦幻美意空灵飘浮游荡飞翔闪烁',
+                        timestamp: '2024-01-15 11:15'
+                    },
+                    {
+                        id: '3',
+                        input: '举头望明月，低头思故乡',
+                        poetry: '举头望明月\n低头思故乡',
+                        floatingText: '举头望明月低头思故乡诗星梦幻美意空灵飘浮游荡飞翔闪烁',
+                        timestamp: '2024-01-15 12:00'
+                    }
+                ];
+            }
+            
+            renderHistory();
+        }
+
+        // 渲染历史记录
+        function renderHistory() {
+            const grid = document.getElementById('historyGrid');
+            
+            if (history.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📚</div>
+                        <h3>暂无历史记录</h3>
+                        <p>请返回主页生成一些诗歌</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = history.map(item => `
+                <div class="history-card" onclick="showCardDetail('${item.id}')">
+                    <div class="card-header">
+                        <div class="card-title">${item.input}</div>
+                        <div class="card-icon">✨</div>
+                    </div>
+                    <div class="card-poetry" style="font-size: ${currentFontSize}px; color: ${currentColor};">${item.poetry}</div>
+                    <div class="card-meta">
+                        <span class="card-time">${item.timestamp}</span>
+                        <div class="card-actions">
+                            <span class="card-action-btn" onclick="event.stopPropagation(); copyText('${item.id}')">复制</span>
+                            <span class="card-action-btn" onclick="event.stopPropagation(); downloadText('${item.id}')">下载</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示卡片详情
+        function showCardDetail(id) {
+            const item = history.find(h => h.id === id);
+            if (!item) return;
+            
+            // 创建详情弹窗
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: rgba(10, 14, 39, 0.95);
+                    border: 2px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 20px;
+                    padding: 40px;
+                    max-width: 600px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    position: relative;
+                ">
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        position: absolute;
+                        top: 20px;
+                        right: 20px;
+                        background: none;
+                        border: none;
+                        color: white;
+                        font-size: 30px;
+                        cursor: pointer;
+                    ">×</button>
+                    
+                    <h3 style="
+                        font-size: 24px;
+                        font-weight: bold;
+                        background: linear-gradient(45deg, #ffd700, #8b5cf6);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        margin-bottom: 20px;
+                    ">${item.input}</h3>
+                    
+                    <div style="
+                        font-family: 'KaiTi', serif;
+                        font-size: 20px;
+                        line-height: 2;
+                        white-space: pre-wrap;
+                        margin-bottom: 30px;
+                        padding: 20px;
+                        background: rgba(0, 0, 0, 0.3);
+                        border-radius: 10px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                    ">${item.poetry}</div>
+                    
+                    <div style="
+                        display: flex;
+                        gap: 15px;
+                        justify-content: center;
+                    ">
+                        <button onclick="copyText('${item.id}'); this.parentElement.parentElement.parentElement.remove();" style="
+                            padding: 12px 24px;
+                            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: bold;
+                            cursor: pointer;
+                        ">复制文本</button>
+                        <button onclick="downloadText('${item.id}'); this.parentElement.parentElement.parentElement.remove();" style="
+                            padding: 12px 24px;
+                            background: linear-gradient(45deg, #ffd700, #8b5cf6);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: bold;
+                            cursor: pointer;
+                        ">下载文件</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // 复制文本
+        function copyText(id) {
+            const item = history.find(h => h.id === id);
+            if (!item) return;
+            
+            navigator.clipboard.writeText(item.poetry).then(() => {
+                alert('诗歌已复制到剪贴板！');
+            }).catch(() => {
+                // 备用方案
+                const textArea = document.createElement('textarea');
+                textArea.value = item.poetry;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('诗歌已复制到剪贴板！');
+            });
+        }
+
+        // 下载文本
+        function downloadText(id) {
+            const item = history.find(h => h.id === id);
+            if (!item) return;
+            
+            const blob = new Blob([item.poetry], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `poetry-${item.timestamp.replace(/[:\s]/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('诗歌文件已下载！');
+        }
+
+        // 创建浮动文字
+        function createFloatingText() {
+            const chars = '诗星梦幻美意空灵飘浮游荡飞翔闪烁宇宙星辰月光清风流水花香鸟语';
+            
+            setInterval(() => {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const floatingText = document.createElement('div');
+                floatingText.className = 'floating-text';
+                floatingText.textContent = char;
+                floatingText.style.left = Math.random() * 100 + '%';
+                floatingText.style.top = Math.random() * 100 + '%';
+                floatingText.style.color = ['#ffd700', '#8b5cf6', '#ec4899', '#ffffff'][Math.floor(Math.random() * 4)];
+                floatingText.style.fontSize = (Math.random() * 20 + 16) + 'px';
+                
+                // 设置随机移动路径
+                const randomX = (Math.random() - 0.5) * 400;
+                const randomY = (Math.random() - 0.5) * 400;
+                const randomX2 = (Math.random() - 0.5) * 400;
+                const randomY2 = (Math.random() - 0.5) * 400;
+                
+                floatingText.style.setProperty('--random-x', randomX + 'px');
+                floatingText.style.setProperty('--random-y', randomY + 'px');
+                floatingText.style.setProperty('--random-x2', randomX2 + 'px');
+                floatingText.style.setProperty('--random-y2', randomY2 + 'px');
+                
+                document.body.appendChild(floatingText);
+                
+                // 6秒后移除元素
+                setTimeout(() => {
+                    if (floatingText.parentNode) {
+                        floatingText.parentNode.removeChild(floatingText);
+                    }
+                }, 6000);
+            }, 2000);
+        }
+
+        // 返回主页
+        function goBack() {
+            window.close();
+            // 如果无法关闭窗口，则尝试跳转到主页
+            if (!window.closed) {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
+

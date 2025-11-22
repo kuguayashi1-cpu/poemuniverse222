@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-cosmic-blue text-white overflow-x-hidden;
+    background-image: 
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.3), transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+}
+
+@layer components {
+  .cosmic-text {
+    @apply bg-gradient-to-r from-star-gold via-nebula-purple to-cosmic-pink bg-clip-text text-transparent;
+  }
+  
+  .floating-text {
+    @apply absolute text-white opacity-60 pointer-events-none select-none;
+    animation: drift 8s linear infinite;
+  }
+  
+  .poetry-box {
+    @apply bg-black bg-opacity-30 backdrop-blur-sm border border-white border-opacity-20 rounded-lg p-6;
+  }
+  
+  .cosmic-button {
+    @apply bg-gradient-to-r from-nebula-purple to-cosmic-pink hover:from-cosmic-pink hover:to-star-gold 
+           text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 
+           transform hover:scale-105 hover:shadow-lg hover:shadow-nebula-purple;
+  }
+}
+

@@ -1303,6 +1303,98 @@
             overflow-y: auto;
         }
 
+        /* 太空漂浮体面板 */
+        .floating-bodies-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            background: rgba(10, 14, 39, 0.98);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            z-index: 200;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .floating-bodies-panel.open {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .floating-bodies-header {
+            padding: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 14, 39, 0.98);
+            z-index: 1;
+        }
+
+        .floating-bodies-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .floating-bodies-content {
+            padding: 20px;
+        }
+
+        .poem-link-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .poem-link-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .poem-link-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .poem-link-author {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .poem-link-url {
+            font-size: 12px;
+            color: rgba(180, 200, 255, 0.8);
+            word-break: break-all;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .poem-link-url:hover {
+            color: rgba(200, 220, 255, 1);
+        }
+
         /* 历史面板 */
         .history-panel {
             position: fixed;
@@ -1431,6 +1523,23 @@
             .action-buttons {
                 flex-direction: column;
                 align-items: center;
+            }
+
+            .floating-bodies-panel {
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .poem-link-item {
+                padding: 15px;
+            }
+
+            .poem-link-title {
+                font-size: 16px;
+            }
+
+            .poem-link-url {
+                font-size: 11px;
             }
             
             .history-panel {
@@ -1570,6 +1679,7 @@
                 <button class="action-btn" onclick="showOverview()">查看总览</button>
                 <button class="action-btn secondary" onclick="saveResult()">保存结果</button>
                 <button class="action-btn secondary" onclick="openExhibition()">诗歌展览馆</button>
+                <button class="action-btn secondary" onclick="openFloatingBodies()">太空漂浮体</button>
             </div>
         </section>
     </div>
@@ -1598,6 +1708,17 @@
         </div>
     </div>
     
+    <!-- 太空漂浮体面板 -->
+    <div class="floating-bodies-panel" id="floatingBodiesPanel">
+        <div class="floating-bodies-header">
+            <h3 class="floating-bodies-title">太空漂浮体</h3>
+            <button class="close-btn" onclick="closeFloatingBodies()">×</button>
+        </div>
+        <div class="floating-bodies-content" id="floatingBodiesContent">
+            <p style="text-align: center; color: #999; padding: 20px;">正在加载...</p>
+        </div>
+    </div>
+
     <!-- API配置面板 -->
     <div class="proxy-config-panel" id="proxyConfigPanel">
         <div class="proxy-config-header">
@@ -2406,8 +2527,129 @@
 
         // 打开诗歌展览馆
         function openExhibition() {
-            window.open('exhibition.html', '_blank');
+            window.open('gallery.html', '_blank');
         }
+
+        // 打开太空漂浮体面板
+        function openFloatingBodies() {
+            const panel = document.getElementById('floatingBodiesPanel');
+            panel.classList.add('open');
+            loadFloatingBodies();
+        }
+
+        // 关闭太空漂浮体面板
+        function closeFloatingBodies() {
+            const panel = document.getElementById('floatingBodiesPanel');
+            panel.classList.remove('open');
+        }
+
+        // 备用诗歌数据
+        const fallbackPoems = [
+            { id: 1, title: "唐人街的灯火", author: "Hody Hong" },
+            { id: 2, title: "那里还是俺老家", author: "Jieru" },
+            { id: 3, title: "重走兒時路記憶檔案「陌生的家」", author: "Peng走走" },
+            { id: 4, title: "芳村郭村 / 北京路征地", author: "文礼" },
+            { id: 5, title: "大台北水吧", author: "耶耶" },
+            { id: 6, title: "佛山季华六路彩管厂爆破現場", author: "Ethan Lee" },
+            { id: 7, title: "08 年董垚过生日", author: "董垚" },
+            { id: 8, title: "游客照与闽东电机厂", author: "王不要" },
+            { id: 9, title: "生锈的框架", author: "万古八甲" },
+            { id: 10, title: "22", author: "Lam" }
+        ];
+
+        // 加载太空漂浮体列表
+        async function loadFloatingBodies() {
+            const content = document.getElementById('floatingBodiesContent');
+            content.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">正在加载...</p>';
+
+            let poems = null;
+
+            try {
+                // 尝试多个可能的路径
+                const possiblePaths = [
+                    'poems.json',
+                    './poems.json',
+                    '../poems.json',
+                    window.location.pathname.replace(/\/[^/]*$/, '/') + 'poems.json'
+                ];
+
+                let response = null;
+                for (const path of possiblePaths) {
+                    try {
+                        response = await fetch(path);
+                        if (response.ok) {
+                            poems = await response.json();
+                            break;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+
+                // 如果所有路径都失败，使用备用数据
+                if (!poems || !Array.isArray(poems) || poems.length === 0) {
+                    console.warn('无法加载 poems.json，使用备用数据');
+                    poems = fallbackPoems;
+                }
+            } catch (error) {
+                console.warn('加载 poems.json 失败，使用备用数据:', error);
+                poems = fallbackPoems;
+            }
+
+            // 渲染诗歌列表
+            try {
+                // 获取当前页面的基础URL（用于GitHub Pages）
+                const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
+                
+                let html = '';
+                poems.forEach(poem => {
+                    const pageUrl = `${baseUrl}poem-${poem.id}.html`;
+                    html += `
+                        <div class="poem-link-item" onclick="window.open('${pageUrl}', '_blank')">
+                            <div class="poem-link-title">${poem.title}</div>
+                            <div class="poem-link-author">素材提供者：${poem.author}</div>
+                            <div class="poem-link-url" onclick="event.stopPropagation(); copyToClipboard('${pageUrl}')" title="点击复制链接">
+                                ${pageUrl}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                content.innerHTML = html;
+            } catch (error) {
+                console.error('渲染诗歌列表失败:', error);
+                content.innerHTML = `
+                    <div style="text-align: center; color: #ff6b6b; padding: 20px;">
+                        <p style="margin-bottom: 10px;">渲染失败：${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('链接已复制到剪贴板！');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                // 备用方法
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('链接已复制到剪贴板！');
+            });
+        }
+
+        // 点击面板外部关闭
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('floatingBodiesPanel');
+            if (panel && panel.classList.contains('open') && !panel.contains(event.target) && !event.target.closest('.action-btn')) {
+                closeFloatingBodies();
+            }
+        });
         
         // API配置相关函数
         function loadProxyConfig() {
