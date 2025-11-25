@@ -2527,7 +2527,25 @@
 
         // 打开诗歌展览馆
         function openExhibition() {
-            window.open('gallery.html', '_blank');
+            try {
+                // 尝试打开 gallery.html
+                const galleryUrl = 'gallery.html';
+                const galleryWindow = window.open(galleryUrl, '_blank');
+                
+                // 检查窗口是否成功打开
+                if (!galleryWindow || galleryWindow.closed || typeof galleryWindow.closed === 'undefined') {
+                    // 可能是被弹窗阻止器阻止了
+                    alert('无法打开诗歌展览馆。请检查浏览器是否阻止了弹窗，或尝试手动访问 gallery.html 文件。');
+                } else {
+                    // 监听窗口加载错误
+                    galleryWindow.addEventListener('error', function(e) {
+                        console.error('诗歌展览馆加载错误:', e);
+                    });
+                }
+            } catch (error) {
+                console.error('打开诗歌展览馆失败:', error);
+                alert('打开诗歌展览馆失败：' + error.message + '\n\n请确保 gallery.html 文件存在于同一目录下。');
+            }
         }
 
         // 打开太空漂浮体面板
